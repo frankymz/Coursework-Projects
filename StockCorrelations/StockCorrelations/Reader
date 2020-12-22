@@ -1,0 +1,207 @@
+// ArrayList, File and Buffered Reader, Statistics (Correlation, Average, Standard Dev)
+// Tokens, Exceptions
+
+package project1;
+
+import java.io.*;
+import java.util.*;
+
+public class Project1 {
+
+    public static void main(String[] args) {
+        
+        // The name of the file to open.
+        // notice that the StockPrice_X_Data.txt is in the data package
+        String fileName = "src/data/Stock_Data.txt"; 
+
+        String line = null; // This will reference one line at a time
+        
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader =  new FileReader(fileName);
+
+            // Wraps FileReader in BufferedReader.
+            BufferedReader bufferedReader =  new BufferedReader(fileReader);
+            
+            String comma = "[,]"; // each number is separated by a comma
+            int counter = 1;
+            
+            ArrayList<Double> x_stockPrice = new ArrayList<>();
+            ArrayList<Double> ge_stockPrice = new ArrayList<>();
+            ArrayList<Double> appl_stockPrice = new ArrayList<>();
+            ArrayList<Double> goog_stockPrice = new ArrayList<>();
+            ArrayList<Double> f_stockPrice = new ArrayList<>();
+            
+           while ((line= bufferedReader.readLine()) !=null){
+               if(counter!=1){
+                   
+                   String[] tokens = line.split(comma);
+                                
+                   x_stockPrice.add(Double.parseDouble(tokens[1]));
+                   ge_stockPrice.add(Double.parseDouble(tokens[2]));
+                   appl_stockPrice.add(Double.parseDouble(tokens[3]));
+                   goog_stockPrice.add(Double.parseDouble(tokens[4]));
+                   f_stockPrice.add(Double.parseDouble(tokens[5]));
+                     
+               }
+            counter++;
+        }
+         
+        bufferedReader.close(); // Close file
+
+            //------------------------------------------------------------------
+            // Doing some calculations
+     
+            // correlating every set of stock price to each other
+        ArrayList<Double> x_Correlation = new ArrayList<>();
+        x_Correlation.add(Math.round(findCorrelation(x_stockPrice,
+             x_stockPrice)*100.0)/100.0);
+        x_Correlation.add(Math.round(findCorrelation(x_stockPrice,
+             ge_stockPrice)*100.0)/100.0);
+        x_Correlation.add(Math.round(findCorrelation(x_stockPrice,
+             appl_stockPrice)*100.0)/100.0);
+        x_Correlation.add(Math.round(findCorrelation(x_stockPrice,
+             goog_stockPrice)*100.0)/100.0);
+        x_Correlation.add(Math.round(findCorrelation(x_stockPrice,
+             f_stockPrice)*100.0)/100.0);
+                        
+        ArrayList<Double> ge_Correlation = new ArrayList<>();
+        ge_Correlation.add(Math.round(findCorrelation(ge_stockPrice,
+             x_stockPrice)*100.0)/100.0);
+        ge_Correlation.add(Math.round(findCorrelation(ge_stockPrice,
+             ge_stockPrice)*100.0)/100.0);
+        ge_Correlation.add(Math.round(findCorrelation(ge_stockPrice,
+             appl_stockPrice)*100.0)/100.0);
+        ge_Correlation.add(Math.round(findCorrelation(ge_stockPrice,
+             goog_stockPrice)*100.0)/100.0);
+        ge_Correlation.add(Math.round(findCorrelation(ge_stockPrice,
+             f_stockPrice)*100.0)/100.0);
+                        
+                        
+        ArrayList<Double> appl_Correlation = new ArrayList<>();
+        appl_Correlation.add(Math.round(findCorrelation(
+             appl_stockPrice, x_stockPrice)*100.0)/100.0);
+        appl_Correlation.add(Math.round(findCorrelation(
+             appl_stockPrice, ge_stockPrice)*100.0)/100.0);
+        appl_Correlation.add(Math.round(findCorrelation(
+             appl_stockPrice, appl_stockPrice)*100.0)/100.0);
+        appl_Correlation.add(Math.round(findCorrelation(
+             appl_stockPrice, goog_stockPrice)*100.0)/100.0);
+        appl_Correlation.add(Math.round(findCorrelation(
+             appl_stockPrice, f_stockPrice)*100.0)/100.0);
+                        
+        ArrayList<Double> goog_Correlation = new ArrayList<>();
+        goog_Correlation.add(Math.round(findCorrelation(
+             goog_stockPrice, x_stockPrice)*100.0)/100.0);
+        goog_Correlation.add(Math.round(findCorrelation(
+             goog_stockPrice, ge_stockPrice)*100.0)/100.0);
+        goog_Correlation.add(Math.round(findCorrelation(
+             goog_stockPrice, appl_stockPrice)*100.0)/100.0);
+        goog_Correlation.add(Math.round(findCorrelation(
+             goog_stockPrice, goog_stockPrice)*100.0)/100.0);
+        goog_Correlation.add(Math.round(findCorrelation(
+             goog_stockPrice, f_stockPrice)*100.0)/100.0);
+                        
+        ArrayList<Double> f_Correlation = new ArrayList<>();
+        f_Correlation.add(Math.round(findCorrelation(f_stockPrice,
+             x_stockPrice)*100.0)/100.0);
+        f_Correlation.add(Math.round(findCorrelation(f_stockPrice,
+             ge_stockPrice)*100.0)/100.0);
+        f_Correlation.add(Math.round(findCorrelation(f_stockPrice,
+             appl_stockPrice)*100.0)/100.0);
+        f_Correlation.add(Math.round(findCorrelation(f_stockPrice,
+             goog_stockPrice)*100.0)/100.0);
+        f_Correlation.add(Math.round(findCorrelation(f_stockPrice,
+             f_stockPrice)*100.0)/100.0);
+                        
+             
+        ArrayList<ArrayList<Double>> correlation_Matrix = new ArrayList<ArrayList
+                <Double>>(); // arrayList in arrayList
+        
+        correlation_Matrix.add(x_Correlation);       
+        correlation_Matrix.add(ge_Correlation);
+        correlation_Matrix.add(appl_Correlation);
+        correlation_Matrix.add(goog_Correlation);
+        correlation_Matrix.add(f_Correlation);
+                             
+        for(int i=0; i<correlation_Matrix.size(); i++){  // printing
+            System.out.println(correlation_Matrix.get(i));
+           
+        }    
+        
+        // handle errors if they arise
+        } catch(FileNotFoundException ex) {
+            System.out.println(
+                "Unable to open file '" + 
+                fileName + "'");                
+        } catch(IOException ex) {
+            System.out.println(
+                "Error reading file '" 
+                + fileName + "'");                  
+        }//end try
+      
+    }// end main
+    
+//------------------------------------------------------------------------------
+// helper functions
+    
+    // sum of the values divided by the number of values
+    public static double findAverage(ArrayList<Double> prices){
+        
+        
+        double addition= 0.0;
+        double average= 0.0;
+        int n= prices.size();
+      
+        for(int i=0; i<n; i++){
+            addition += prices.get(i);
+        }   
+         
+        average= addition/n;
+        return average;
+    }
+    
+    //--------------------------------------------------------------------------
+    //amount of variation/dispersion in the set of values
+    public static double findStandardDeviation(ArrayList<Double> prices){
+        
+        double standardDev= 0.0;
+        double standardSum= 0.0;
+           
+        int n = prices.size();
+        double stdaverage = Project1.findAverage(prices);
+           
+        for(int i=0; i<n; i++){
+            standardSum += Math.pow(prices.get(i)-stdaverage,2.0);
+        }
+        
+        standardDev= Math.sqrt(standardSum / (n-1.0));
+        return standardDev; 
+    }  
+
+    //--------------------------------------------------------------------------
+    // each set of data gets correlated with each other
+    public static double findCorrelation(ArrayList<Double> firstPrices, 
+            ArrayList<Double> secondPrices ){
+            
+        double internalSum= 0.0;
+        
+        double stdDevFirstPrices= findStandardDeviation(firstPrices);
+        double stdDevSecondPrices= findStandardDeviation(secondPrices);
+        int n = firstPrices.size();
+            
+        double averageFirstPrices = findAverage(firstPrices);
+        double averageSecondPrices = findAverage(secondPrices);
+            
+        for(int i=0; i<n; i++){
+            internalSum += (firstPrices.get(i)- averageFirstPrices)*
+                        (secondPrices.get(i)-averageSecondPrices);
+        }
+        double division= 1.0/(n-1.0);
+        double denominator = stdDevFirstPrices * stdDevSecondPrices;
+        double correlation = 0.0;
+        correlation= division * (internalSum/denominator);          
+        return correlation;
+    }
+    
+}
